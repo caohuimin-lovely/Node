@@ -1,0 +1,261 @@
+mongo	进入mongodb Shell
+
+show dbs	显示所有的数据库，如果数据库里没有数据，就不会显示
+
+db	查看当前数据库
+
+use nz1903	创建或者切换数据库
+
+show collections/show tables	显示当前的集合(表)名称
+
+db.getCollectionNames()	显示当前的集合(表)名称--数组形式
+
+db.createCollection("music");	创建集合（表）
+
+db.getName()	获取当前数据库名称
+
+db.version()	查看数据库版本
+
+db.stats	显示当前DB状态
+
+db.getMongo()	查看当前DB的链接机器地址
+
+db.dropDatabase()	删除数据库,前提是切换到要删除的数据库
+
+插入
+一
+db.users.insert({
+    add : "huahua"
+});
+二
+db.users.insert([
+    {username : "aa"},
+    {username : "bb"}
+]);
+三
+只能插入一条数据，多写无用
+db.users.insertOne({username : "cc"},{username : "dd"});        
+四
+只能接受数组
+db.users.insertMany([
+    {
+        username : "lisi"
+    },
+    {
+        username : "wangwu"
+    }
+])
+五
+类似于insert
+db.users.save({username: "ee"});
+
+修改
+db.uses.updateMany({条件},{$set{}})
+db.users.updateMany(
+    {},
+    {
+        $set:{
+            password : "123456"
+        }
+    }
+)
+db.users.updateMany(
+    {
+        username : "aa"
+    },
+    {
+        $set:{
+            phone : "1111111"
+        }
+    }
+)
+$inc累计加
+db.users.updateMany(
+    {
+        username : "cc"
+    },
+    {
+        $inc:{
+            age : 20
+        }
+    }
+)
+
+删除
+db.music.drop() 删除表
+删除信息
+db.users.deleteMany({
+    _id : ObjectId("5e9091c43e1893bbff8a5c4e")
+})
+db.users.deleteMany({
+    username : "ee"
+})
+全删
+db.users.deleteMany({})
+
+查询
+db.userinfo.find({query},{field})  
+db.users.find() 查询所有 数组
+db.users.find({username : "aa"})
+db.users.find({},{username:1,password:1})
+db.users.find({},{username:1})  只显示username  _id默认显示
+db.users.find({},{_id:0})   不显示_id
+
+去重查询
+db.users.distinct("username");
+
+$gt   great then > 
+$gte  great then equal >=
+$lt   less then  <
+$lte  less then equal <= 
+db.users.find(
+    {age:{$gt:30}}
+)
+db.users.find(
+    {age:{$gte:25}}
+)
+db.users.find(
+    {age:{$lt:20}}
+)
+db.users.find(
+    {age:{$lte:25}}
+)
+
+$or  or
+db.users.find({
+    $or:[
+        {
+            username : "aa"
+        },
+        {
+            age : 23
+        }
+    ]
+})
+
+模糊查询  like 
+db.users.find(
+    {username : /^aa$/}
+)
+db.users.find(
+    {username : /c$/}
+)
+db.users.find(
+    {username : /si/}
+)
+正则 new RegExp
+db.users.find(
+    {username : new RegExp("li")}
+)
+
+https://api.douban.com/v2/movie/top250  ===> subjects 
+
+db.mvs.find(
+    {},
+    {_id:0,title:1}
+)
+db.mvs.find(
+    {},
+    {_id:0,title:1,year:1,'rating.average':1}
+)
+db.mvs.find(
+    {
+        'rating.average':{ $gt : 9.4}    
+    },
+    {_id:0,title:1,'rating.average':1}
+)
+
+db.mvs.find(
+    {
+        year:'1997'    
+    },
+    {_id:0,title:1,'rating.average':1}
+)
+db.mvs.find({
+    $or:[
+        {
+            year : "1997"
+        },
+        {
+            "rating.average":9.2
+        }
+    ]
+},{
+    _id:0,
+    title:1,
+    year:1,
+    "rating.average":1
+})
+
+排序 1 表示升序 -1 降序 
+db.mvs.find(
+    {},
+    {
+        _id:0,
+        title:1,
+        year:1
+    }
+).sort({year:1})
+db.mvs.find(
+    {},
+    {
+        _id:0,
+        title:1,
+        'rating.average':1
+    }
+).sort({'rating.average':-1})
+
+限制条数  limit 
+db.mvs.find(
+    {},
+    {_id:0,title:1,year:1}
+).limit(10) 显示10条
+db.mvs.find(
+    {},
+    {_id:0,title:1,year:1}
+).limit(10).skip(3) 跳过3条
+
+长度  条数  count 所有集合数据 size 满足条件的集合数据
+db.mvs.find().count();  20
+db.mvs.find().skip(3).count();  20  无视条件
+db.mvs.find().size();   20
+db.mvs.find().skip(3).size();   17  真实长度
+
+db.mvs.find(
+    {},
+    {_id:0,year:1,title:1}
+).sort({year:-1}).limit(1)
+
+判断 列 field 是否存在
+db.mvs.find(
+    {year:{$exists:true}},
+    {_id:0,title:1}
+)
+
+$in  包含
+或者爱情、或者科幻
+db.mvs.find(
+    {
+        genres:{
+            $in : ["爱情","科幻"]   
+        }
+    },
+    {
+        _id:0,
+        title:1,
+        genres:1
+    }
+)
+$nin  不包含
+db.mvs.find(
+    {
+        genres:{
+            $nin : ["爱情","科幻"]   
+        }
+    },
+    {
+        _id:0,
+        title:1,
+        genres:1
+    }
+)

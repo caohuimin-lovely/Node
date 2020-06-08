@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>逆战聊天室</title>
+    <style>
+        #chatroom{
+            width:360px;
+            height:490px;
+            border:2px solid darkorchid;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h2>NZ1903-聊天室</h2>
+        <div id="chatroom">
+            <!-- 接收聊天内容  -->
+        </div>
+        <div>
+            <input type="text" placeholder="请输入聊天内容" id="word">
+            <input type="button" value="发送内容" id="sendbtn">
+        </div>
+    </div>
+</body>
+<script>
+    // 客服端的代码
+
+    // 客户端 socket 功能
+    // 1. 创建客户端socket
+    // 2. 连接服务器端
+    // 3. 发送消息给服务器
+    // 4. 接受服务器发来的消息
+    // 5. 监听服务器关闭 或者异常
+
+    // 1. 创建客户端socket
+    const ws = new WebSocket("ws://localhost:3900");    //WebSocket html5新增
+    // 2. 连接服务器端
+    ws.onopen = function(){
+        ws.send("启动服务器默认发送的一句话");
+    }
+    
+    // 3. 发送消息给服务器
+    function sendMsg(){
+        ws.send(word.value);
+        word.value = "";
+    }
+    sendbtn.onclick = sendMsg;  //这里不可以加() 赋值
+    // 绑定一个键盘事件
+    document.onkeydown = function(e){
+        if(e.keyCode === 13){
+            sendMsg();  //这里要加()，直接执行
+        }
+    }
+
+    // 4. 接受服务器发来的消息
+    ws.onmessage = function(data){
+        console.log(data);
+        document.getElementById("chatroom").innerHTML += `<p>${data.data}</p>`
+    }
+
+    // 5. 监听服务器关闭 或者异常
+    ws.onclose = function(){
+        console.log("服务器已关闭");
+        
+    }
+    ws.onerror = function(err){
+        console.log("服务器出现异常" + err);
+        
+    }
+</script>
+</html>

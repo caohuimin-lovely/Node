@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电影评论</title>
+    <%- include common %>
+</head>
+<body>
+    <%- include("head",{title:"movie"}) %>
+    <div class="container-fluid container">
+        <div class="row">
+            <div class="col-md-4">
+                <h2 class="text-danger text-center">电影详情</h2>
+                <div class="thumbnail">
+                    <img src="<%- result.images.medium.replace(/img7/,'img3') %>" style="height: 180px;width:100%" />
+                    <div class="caption">
+                        <a href="#">
+                            <h4 class="text-primary pull-right"><%- result.year %></h4>
+                            <h4 class="text-danger"><%- result.title %></h4>
+                            <p class="text-seccess">评分：<%- result.rating.average %></p>
+                            <p class="text-info">导演：<%- result.directors[0].name %></p>
+                            <p class="text-warning">分类：<%- result.genres %></p>
+                            <p class="text-warning">演员：<%- result.casts[0].name %></p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h2 class="text-danger text-center">添加评论</h2>
+                <form action="/comment/submit?mid=<%- result.id %>" method="POST">
+                    <div class="form-group">
+                        <label for="titleInput">评论标题</label>
+                        <input name="title" type="text" class="form-control" id="titleInput" placeholder="评论标题"/>
+                    </div>
+                    <div class="from-group">
+                        <label for="contentInput">评论内容</label>
+                        <textarea name="content" placeholder="评论内容" class="from-control" id="contentInput" cols="40" rows="10"></textarea>
+                    </div>
+                    <button class="btn btn-danger" type="submit">提交</button>
+                </form>
+            </div>
+           
+        </div>
+    </div>
+    <%- include foot %>
+</body>
+</html>

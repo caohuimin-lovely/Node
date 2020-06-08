@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电影评论列表</title>
+    <%- include common %>
+</head>
+
+<body>
+    <%- include("head",{title:"mlist"}) %>
+    <div class="container-fluid container">
+        <div class="row">
+            <h2 class="text-info">所有评论---(用户<%- username %>)</h2>
+            <div class="form-group col-md-3">
+                <select onchange="setPageSize()" class="form-control" id="selectcount">
+                    <option value="">请选择每页条数</option>
+                    <option value="4"><%- pageSize==4 ? 'selected' : '' %>每页4条</option>
+                    <option value="8"><%- pageSize==8 ? 'selected' : '' %>每页8条</option>
+                    <option value="10"><%- pageSize==10 ? 'selected' : '' %>每页10条</option>
+                    <option value="15"><%- pageSize==15 ? 'selected' : '' %>每页15条</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="container-fluid container">
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-hover table-bordered">
+                    <caption class="h2 text-info">评论列表</caption>
+                    <tr class="text-danger text-center">
+                        <td>序号</td>
+                        <td>电影标题</td>
+                        <td>电影</td>
+                        <td>评论标题</td>
+                        <td>评论内容</td>
+                        <td>评论人</td>
+                        <td>时间</td>
+                        <td>操作1</td>
+                        <td>操作2</td>
+                    </tr>
+                    <% if(result.length > 0){ %>
+                    <% result.forEach((item, index) => { %>
+                    <tr class="text-center">
+                        <td><%- item.id %></td>
+                        <td><a href="#" data-item='<%- JSON.stringify(item)%>'  onclick="showAllComments(this)"><%- item.mtitle %></a></td>
+                        <td><img style="width:80px;height:auto"
+                                src="<%- item.mpic&&item.mpic.replace(/img7/, 'img3') %>" /></td>
+                        <td><a href="#"><%- item.title %></a></td>
+                        <td><%- item.content %></td>
+                        <td><%- item.username %></td>
+                        <td><%- item.time %></td>
+                        <td>
+                            <%if(item.username === username){ %>
+                            <button onclick="setId('<%- item._id %>')" data-toggle="modal" data-target="#delbox"
+                                class="btn btn-danger">删除</button> <!-- 点击删除弹出模态框,添加点击事件，获取到点击的这个评论的_id -->
+                            <% }else{ %>
+                            <button class="btn btn-danger" disabled>无权限</button>
+                            <% } %>
+                        </td>
+                        <td>
+                            <% if(item.username === username){ %>
+                            <!-- 曲线救国 onclick无法直接传递参数，给button一个属性data-item，用来存放此条评论的所有信息（data-item自定义数据JSON.stringify只能用单引号） -->
+                            <button data-item='<%- JSON.stringify(item)%>' onclick="getItem(this)" data-toggle="modal"
+                                data-target="#updatebox" class="btn btn-primary">修改</button>
+                            <!-- 点击修改弹出修改模态框，添加点击事件，获得此条数据的所有信息 -->
+                            <% }else{ %>
+                            <button class="btn btn-primary" disabled>无权限</button>
+                            <% } %>
+                        </td>
+                    </tr>
+                    <% }) %>
+                    <% } %>
+                </table>
+            </div>
+            <div class="col-md-12 text-center>
+                <nav aria-label=" Page navigation">
+                <ul class="pagination">
+                    <li><a href="/comment/mlist?pageNo=<%- pageNo - 1 %>"><span aria-hidden="true">&laquo;</span></a>
+                    </li>
+                    <li class="one">
+
+                        <%  if(pageNo - 2 === -1){  %>
+                        <a href="" style="display: none;"></a>
+                        <%  }else{  %>
+                        <a href="/comment/mlist?pageNo=<%- pageNo - 2 %>"><%- pageNo - 2 %></a>
+                        <%  }   %>
+
+                    </li>
+                    <li>
+                        <%  if(pageNo - 1 === 0){  %>
+                        <a href="" style="display: none;"></a>
+                        <%  }else{  %>
+                        <a href="/comment/mlist?pageNo=<%- pageNo - 1 %>"><%- pageNo - 1 %></a>
+                        <%  }   %>
+                    </li>
+                    <li class="active">
+                        <a href="/comment/mlist?pageNo=<%- pageNo %>"><%- pageNo %></a>
+                    </li>
+                    <li>
+                        <%  if(pageNo + 1 === totalPage + 1){  %>
+                        <a href="" style="display: none;"></a>
+                        <%  }else{  %>
+                        <a href="/comment/mlist?pageNo=<%- pageNo + 1 %>"><%- pageNo + 1 %></a>
+                        <%  }   %>
+                    </li>
+                    <li>
+                        <%  if(pageNo + 2 === totalPage + 2){  %>
+                        <a href="" style="display: none;"></a>
+                        <%  }else{  %>
+                        <a href="/comment/mlist?pageNo=<%- pageNo + 2 %>"><%- pageNo + 2 %></a>
+                        <%  }   %>
+                    </li>
+                    <li><a href="/comment/mlist?pageNo=<%- pageNo + 1 %>"><span aria-hidden="true">&raquo;</span></a>
+                    </li>
+                    <li>
+                        共 <%-total %> 条 / 第 <%- pageNo %> 页 ===
+                    </li>
+                    <li>
+                        共 <%- totalPage %> 页 / 每页 <%- pageSize %> 条
+                    </li>
+                </ul>
+                </nav>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 删除的模态框 -->
+    <div class="container">
+        <div class="modal fade" tabindex="-1" role="dialog" id="delbox">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">删除警告</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>你真的确定要删除吗&hellip;</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" onclick="deleteCommentById()">确定</button>
+                        <!-- //添加点击事件，删除此条记录 -->
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+    </div>
+
+    <!-- 修改的模态框 -->
+    <div class="container">
+        <div class="modal fade" tabindex="-1" role="dialog" id="updatebox">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">修改评论</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="titleInput">评论标题</label>
+                            <input type="text" class="form-control" id="titleInput" placeholder="评论标题">
+                        </div>
+                        <div class="form-group">
+                            <label for="contentInput">评论内容</label>
+                            <textarea placeholder="评论内容" class="form-control" id="contentInput" cols="20"
+                                rows="10"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-danger" onclick="updateComment()">修改</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+    </div>
+    <%- include foot%>
+</body>
+<script>
+    function showAllComments(that){
+        console.log(that);
+        let mid = JSON.parse($(that).attr("data-item")).mid;
+        console.log(mid);
+        
+        $.ajax({
+            url: "/comment/showAllComments",
+            type : "GET",
+            data : {
+                mid  : mid
+            },
+            success(res){
+                console.log(6666);
+                
+            }
+        })
+    }
+
+    //39行操作2删除按钮获取_id
+    var id = null;
+    function setId(itemid) {
+        id = itemid;
+        console.log("删除的这条内容的" + id); //浏览器控制台输出  不是服务器cmd输出！！！！  
+    }
+    // 73行根据_id(也就是84行获得到的id)来删除，将id传递给路由
+    function deleteCommentById() {
+
+        console.log(id);
+        $.ajax({
+            url: "/comment/delete",
+            type: "GET",
+            data: {
+                _id: id
+            },
+            success(res) {
+                console.log(res);
+                $('#delbox').modal("hide"); //关闭modal
+                window.location.reload();   //刷新当前页面
+            }
+        })
+    }
+
+    // 47行获取当前点击的按钮，方便后面找属性data-item
+    var obj = {};
+    function getItem(that) {
+        console.log(that);
+        // obj = JSON.parse(this.getAttribute("data-item"));
+        obj = JSON.parse($(that).attr("data-item"));
+        console.log(obj);
+        // 将初始的评论标题和评论内容放在输入框中
+        $("#titleInput").val(obj.title);
+        $("#contentInput").val(obj.content);
+    }
+
+    // 102行，点击模态框修改按钮，将数据传递给路由
+    function updateComment() {
+        $.ajax({
+            url: "/comment/update",    //修改评论
+            type: "post",
+            data: {
+                title: $("#titleInput").val(),
+                content: $("#contentInput").val(),
+                id: obj.id //id：当前评论第几条
+            },
+            success(res) {
+                console.log(res);
+                $("#updatebox").modal("hide");  //关闭模态框
+                window.location.reload();   //重新加载页面
+            }
+        })
+    }
+
+    // 15行选择每页显示几条评论
+    function setPageSize(){
+        var pageSize = $("#selectcount").val();
+        window.location.href = "/comment/mlist?pageSize=" + pageSize;
+    }
+</script>
+
+</html>

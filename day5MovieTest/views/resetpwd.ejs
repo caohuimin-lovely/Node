@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>重置密码</title>
+    <%- include common %>
+</head>
+<body>
+    <%- include("head",{title:"my"}) %>
+    <div class="container-fluid">
+        <div class="col-md-4"> 
+            <form>
+                <div class="form-group">
+                    <label for="prepwdInput">旧密码</label>
+                    <input name="prepwd value=""  type="text" class="form-control" id="prepwdInput" placeholder="请输入旧密码">
+                </div>
+                <div class="form-group">
+                    <label for="newpwdInput">新密码</label>
+                    <input name="newpwd" value=""  type="text" class="form-control" id="newpwdInput" placeholder="请输入新密码">
+                </div>
+                <div class="form-group">
+                    <label for="renewpwdInput">确认密码</label>
+                    <input name="renewpwd" value=""  type="text" class="form-control" id="renewpwdInput" placeholder="请输入旧密码">
+                </div>
+                <button type="button" class="btn btn-primary" onclick="changePwd()">提交修改</button>
+            </form>
+        </div>
+    </div>
+    <%- include foot %>
+    <script>
+        function changePwd(){
+            $.ajax({
+                url:"/users/changePwd",
+                type : "POST",
+                data : {
+                    prepwd : $("#prepwdInput").val(),
+                    newpwd : $("#newpwdInput").val(),
+                    renewpwd : $('#renewpwdInput').val()
+                },
+                success(res) {
+                    console.log(res);
+                    console.log(res.msg);
+                    
+                    if(res.type){
+                        location.href = "/login";  
+                    }
+                }
+            })
+        }
+    </script>
+</body>
+</html>
+

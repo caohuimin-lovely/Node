@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <%- include common %>
+  </head>
+  <body>
+    <%-  include("head",{title:"首页"})  %>
+    <h1><%= title %></h1>
+    <p>Welcome to <%= title %></p>
+    <!-- 输出变量  输出HTML标签 -->
+    <!-- 一行js代码必须包起来 -->
+    
+    <% if(username){ %>
+      <h3>欢迎你，<%- username %></h3>
+    <% }else{ %>
+      <h3>你还没与登录</h3>
+    <% } %>
+
+    <% course.forEach((item, index) => { %>
+      <div>
+        <h2><%- index%>----<%- item%></h2>
+      </div>
+    <% }) %>
+    <%- include foot %>
+  </body>
+</html>
